@@ -1,0 +1,112 @@
+\section{Description of tasks}
+
+In this section I'll list and explain the tasks required to fulfill the project's 
+objective. These tasks are sorted by requirements, that is, every task requires the 
+one before it to be able to start working on it. For all of the tasks a Laptop PC 
+will be needed.
+
+\subsection{Project planning}
+
+This task consist mainly in all the tasks that the GEP course covers. It contains 
+the following subtasks:
+
+\begin{itemize}
+\item Context and scope definition
+\item Temporal planning
+\item Budget and sustainability
+\end{itemize}
+
+This first task is very important, as it lays out the path for the whole project. 
+It makes everything else almost straightforward as the overall view of the project 
+is already thought.
+
+The dependencies between the tasks are defined by the order they are presented. That 
+means that the task 2 requires the task 1 to be done before being able to work on 
+it, and so on with the following tasks.
+
+\subsection{Game framework}
+
+This is the main task for the project. It consist on the development, testing and 
+documentation of all the parts that conform the game framework. This main task can 
+be divided in the subtasks explained in the following sections.
+
+\subsubsection{Helper classes}
+
+This task consists of developing a set of classes containing general functionality 
+for game development. These functionalities consist of describing spatial transformation 
+of objects, measuring time and storing intervals of time. These functionalities will 
+be encapsulated in the following classes, respectively: \textit{Transformation},
+\textit{Clock}, \textit{Time}.
+
+\subsubsection{Actor and Behavior classes}
+
+This task consists of designing the behavior system and implementing the \textit{Behavior} 
+virtual class. It also includes implementing the \textit{Actor} class, which will 
+mainly be a container for behaviors, and its interface for being able to update the 
+game state.
+
+
+\subsubsection{Game class}
+
+The \textit{Game} class implements the main loop and contains the actor pool. At this stage 
+this class won't include the plug-in system, that will be implemented afterwards. 
+Moreover, this task will also include extensive testing of all the system up to this 
+point, looking for bugs and memory leaks.
+
+\subsubsection{Plug-in system}
+
+After the \textit{Game} class is implemented and thoroughly tested, comes this task. 
+It consists in adding the plug-in system to the \textit{Game} class. That is, designing 
+and implementing the \textit{Plugin} virtual class and extending the \textit{Game} 
+class to handle the plug-ins.
+
+Once this task is done, the framework is completed and ready to use.
+
+\subsection{SFML plug-in (MOGL)}
+
+This task consists in developing a \textit{Plugin} for the game framework that wraps 
+the SFML functionality in a way that is useful for developing 2D games with the framework 
+and this plug-in.
+
+\subsubsection{Resource Managers}
+
+All games have resources that occupy space in memory such as textures or sounds among 
+others. This task consists in developing managers for these resources to handle them 
+efficiently.
+
+\subsubsection{Input handler}
+
+User input is what makes a game really a game, otherwise it'd be some kind of movie. 
+This task will focus on implementing a data structure that stores the state of the 
+input and allows querying that state in a simple way.
+
+
+\subsubsection{Drawable classes}
+
+This task consists on designing a \textit{Drawable} interface for \textit{Behavior}s 
+that have a drawable representation. Then, implement the following drawable behaviors:
+
+\begin{itemize}
+\item \textit{Rectangle}, a plain colored rectangle;
+\item \textit{Circle}, a plain colored circle;
+\item \textit{ConvexShape}, a plain colored convex polygon;
+\item \textit{Text}, text using a font;
+\item \textit{Sprite}, a static image from a texture;
+\item \textit{AnimatedSprite}, a animation from a series of images in a given texture (tile 
+sheet).
+\end{itemize}
+
+All drawable behaviors will have their own transformation, relative to their actor.
+
+\subsubsection{MultimediaOGL class}
+
+The \textit{MultimediaOGL} class will contain the logic for the rendering pipeline 
+of the drawable behaviors, the input handles and the resource managers.
+
+Again, at this point all the previous work will be extensively tested to find possible 
+bugs and memory leaks.
+
+\subsection{Final task}
+
+This task is about making sure that all the documentation is done, reviewed to prepare 
+the final presentation.

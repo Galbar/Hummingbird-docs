@@ -1,0 +1,25 @@
+\chapter{Context}\label{ch:context}
+My interest in game development started almost at the same time as my interest in 
+programming.
+
+First, I started experimenting with Game Maker\cite{GameMaker}, where I was able to easily make 
+games by basically drag-and-dropping icons that represented changes in the state 
+of the game. After a lot of trial and error and messing with its scripting language 
+too, I decided to try another tool: Unity Game Engine.
+Unity offered a more complex environment but it also allowed for more complex things
+. I started learning it by doing tutorials and eventually made a few mini-games.
+
+At that point I wanted to implement games in a much lower level. I wanted to understand 
+the insides of how a game works. I started programming games in C++ without using 
+any game developing framework or engine (only using SFML\cite{SFML} for multimedia and rendering
+). The first time was very complicated, but the more games I developed, the better 
+I saw a common pattern in their structure. I always had a main loop\cite{gameloop} with a game 
+state update and render; some kind of object pool; some kind of input handling; and 
+some kind of rendering pipeline. On the other hand, I was almost never able to reuse 
+them because I like trying new technologies, libraries or methods, and most of the 
+time these common structures were entangled with calls to the specific libraries 
+I was using at the moment.
+
+Eventually, I told to myself, why not implement all these functionalities once, in 
+a way that is reusable for my future projects? This is where this project comes into 
+place, to implement a flexible and extensible game development framework.

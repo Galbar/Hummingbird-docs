@@ -1,0 +1,38 @@
+\subsection{Rectangle}
+
+A rectangle-shaped 1x1 Drawable.
+
+For different sizes use the scale in either the hum::Actor hum::Transform of
+the Drawable's hum::Transform.
+
+The following program draws a 20 by 20 square centered in a 100 by 100 area (camera 
+defaults) scaled to 600 by 600.
+\begin{lstlisting}[caption=Rectangle example]
+#include "hummingbird/hum.hpp"
+#include "MOGL/MOGL.hpp"
+
+int main(void)
+{
+    hum::Game game;
+    auto mogl = game.addPlugin<mogl::MultimediaOGL>(sf::VideoMode(600, 600), "Rectangle example");
+
+    auto actor = game.makeActor();
+    actor->addBehavior<mogl::Rectangle>(sf::Color::Red);
+    actor->transform().position.x = 40;
+    actor->transform().position.y = 40;
+    actor->transform().scale.x = 20;
+    actor->transform().scale.y = 20;
+
+    game.run();
+    return 0;
+}
+\end{lstlisting}
+
+The result is the following capture:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{rectangle_example}
+    \caption{Rectangle example}
+    \label{fig:rectangle_example}
+\end{figure}

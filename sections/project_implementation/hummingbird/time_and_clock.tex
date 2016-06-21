@@ -1,0 +1,17 @@
+\subsection{Time and Clock}
+
+The Time class represents a time interval. It has nanoseconds precision and can 
+queried for its value in seconds, milliseconds, microseconds and nanoseconds.
+
+The Clock class mesures time intervals and stores them in an instance of Time. 
+Clock too has nanoseconds precision.
+
+Usage example:
+\begin{lstlisting}[caption=Clock and Time example]
+hum::Clock clk;
+while(game\_is\_running)
+{
+  hum::Time deltaTime = clk.reset();
+  ... // Game code
+}
+\end{lstlisting}

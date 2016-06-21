@@ -1,0 +1,34 @@
+\section{Evolution of the implementation}
+
+Throughout the development of the project the design of the framework has suffered changes. 
+A few of them are explained below.
+
+\subsection{Removal of Scene}
+The initial design of the framework included a class for scenes. After a few iterations 
+the Scene class felt pointless, having the only functionality of creating the required 
+actors at the start, keeping track of them and finally destroying them.
+
+This functionality can be implemented, with better results, with a plugin that does 
+exactly the same. With the advantage that said plugin would be tailored to whatever 
+needs the actual implementation of the game uses (p.e. scene file format).
+
+And so, the Scene class was droped.
+
+\subsection{Vector2 and Vector3}
+Initialy there were not going to be any kind of vector class. The Transformation class 
+would include all needed spatial information and that was it.
+
+When the implementation of MOGL started, more and more the need for a way to represent 
+spatial information was needed. Mainly to normalize the representation of said information, 
+at one point there were sf::Vector3 and glm::vec3 in the public API of the library.
+
+The decision was made to implement Vector2 and Vector3 in a effort to unify the spatial 
+information throughout all the Hummingbird framework and MOGL plugin.
+
+\subsection{Draw using OpenGL}
+The initial plan was to make use of SFML's Drawable classes to render. At some point 
+the decision was made to render the geometry directly using OpenGL so that future implementations 
+of Drawables for 3D geometry were easier.
+
+This change implied a complete refactor of the rendering pipeline, requiring the 
+management of shaders and the addition of a camera.

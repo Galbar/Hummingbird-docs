@@ -1,0 +1,25 @@
+\subsection{Vector3}
+
+hum::Vector3 is very similar to hum::Vector2, the only one difference is that it 
+has three dimensions (x, y and z) instead of two. It works the same way Vector2 does 
+and implements the same operations.
+
+As for Vector2, you generally don't have to care about the templated form (hum::Vector3<T>),
+the most common specializations have special typedefs:
+\begin{itemize}
+\item hum::Vector3<float> is hum::Vector3f
+\item hum::Vector3<int> is hum::Vector3i
+\end{itemize}
+
+Usage example:
+\begin{lstlisting}[caption=Vec3 example]
+hum::Vector3f v1(16.5f, 24.f, 13.f);
+v1.x = 18.2f;
+float y = v1.y;
+
+hum::Vector3f v2 = v1 * 5.f;
+hum::Vector3f v3;
+v3 = v1 + v2;
+
+bool different = (v2 != v3);
+\end{lstlisting}

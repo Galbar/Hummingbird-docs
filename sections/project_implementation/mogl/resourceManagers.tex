@@ -1,0 +1,157 @@
+\subsection{ResourceManagers}
+
+\subsubsection{TextureManager}
+
+A hum::ResourceManager for sf::Texture.
+
+Example:
+\begin{lstlisting}[caption=TextureManager example]
+mogl::TextureManager tm;
+tm.load("cat", "path/to/cat.jpg");
+sf::Texture* cat = tm.get("cat");
+
+//...
+
+actor.addBehavior<mogl::Sprite>(cat);
+
+//...
+
+tm.free("cat");
+\end{lstlisting}
+
+\subsubsection{SpriteAnimationManager}
+
+A hum::ResourceManager for mogl::SpriteAnimations.
+
+This Resource manager is different because it uses SpriteAnimations as the
+data to "load" and stores a copy of the given SpriteAnimation.
+
+Example:
+\begin{lstlisting}[caption=SpriteAnimationManager example, label=lst:spriteAnimationManager]
+mogl::SpriteAnimation jump{
+  // texture containing the tilesheet
+  game().getPlugin<mogl::MultimediaOGL>()->textures().get("player"),
+  0,  // Horizontal offset of the tilesheet
+  0,  // Vertical offset of the tilesheet
+  0,  // Horizontal margin between tiles in the tilesheet
+  0,  // Vertical margin between tiles in the tilesheet
+  48, // Width of a tile in the tilesheet
+  48, // Height of a tile in the tilesheet
+  {5, 6, 7, 8}, // Sequence of ids of the tiles in the tilesheet to play.
+  std::vector(4, hum::Time::seconds(0.3f)) // Sequence of hum::Times for each frame in the animation.
+};
+
+mogl::SpriteAnimationManager sam;
+sam.load("player_jump", jump);
+
+//...
+
+actor.addBehavior<mogl::AnimatedSprite>(sam.get("player_jump"));
+
+//...
+
+sam.free("player_jump");
+\end{lstlisting}
+
+\subsubsection{SoundManager}
+
+A hum::ResourceManager for sf::SoundBuffers.
+
+This Resource manager is different because it overwrites the get() method and
+has other extra methods.
+
+The SoundManager not just loads sf::SoundBuffers but also allows to play them
+through the method play(). This method returns a std::pair containing the
+id of the sound resource used (the one that is playing the required
+sf::SoundBuffer) and a pointer to the sf::Sound managing the playback of the
+sf::SoundBuffer. Note that a \textit{sound resource} is not the same as a sf::SoundBuffer.
+
+The get() methods are also different. In this manager they are accessed by
+sound ids (which are returned by play) and they return a pointer of the given
+sf::Sound, or nullptr if the sound has been freed.
+
+Example:
+\begin{lstlisting}[caption= SoundManager example]
+mogl::SoundManager sm;
+sm.load("roar", "path/to/roar.ogg");
+
+//...
+
+
+// fixedUpdate()
+if (event)
+{
+  roar_id = sm.play("roar", 50).first; // start playing the "roar" sound
+}
+// onDestroy()
+if (sm.get(roar_id) != nullptr) // if the sound is still playing
+{
+  sm.get(roar_id)->stop(); // stop it
+}
+
+//...
+
+sm.free("roar");
+\end{lstlisting}
+
+As shown in the example, when a sf::SoundBuffer playback is done (Stopped),
+then the \textit{sound resource} is cleared and therefore the sound id invalidated
+(getting its related sound returns nullptr).
+
+Sound ids start at 1 and always grow, that means that a sound id of 0 will
+always return nullptr.
+
+\subsubsection{MusicManager}
+
+A hum::ResourceManager for sf::Music.
+
+Example:
+\begin{lstlisting}[caption=MusicManager example]
+mogl::MusicManager mm;
+mm.load("music1", "path/to/music1.ogg");
+sf::Music* music = mm.get("music1");
+music->play();
+//...
+music->stop();
+mm.free("music1");
+\end{lstlisting}
+
+\subsubsection{ShaderProgramManager}
+A hum::ResourceManager for mogl::ShaderProgram.
+
+This Resource manager is different because it uses ShaderProgramDefs to load
+the resource (ShaderProgram) instead of the usual `std::string`.
+
+Example:
+\begin{lstlisting}[caption=ShaderProgramManager example]
+// Create shaders
+mogl::Shader vs, fs;
+
+// Load vertex shader from file
+vs.loadFromFile(Shader::Type::VERTEX_SHADER, "shader.vert");
+if(!vs.isCompiled())
+{
+  hum::log_e("Vertex shader failed to compile: ", vs.log());
+  return 1;
+}
+
+// Load fragment shader from file
+fs.loadFromFile(Shader::Type::FRAGMENT_SHADER, "shader.frag");
+if(!fs.isCompiled())
+{
+  hum::log_e("Fragment shader failed to compile: ", fs.log());
+  return 1;
+}
+
+mogl::ShaderProgramDef def{vs, fs, "out_color"};
+
+mogl::ShaderProgramManager spm;
+spm.load("plain_shader", def);
+
+mogl::ShaderProgram* sp = spm.get("plain_shader");
+sp->use()->setUniform4f("color", 0, 1, 1, 1);
+
+// ...
+
+spm.free("plain_shader");
+\end{lstlisting}

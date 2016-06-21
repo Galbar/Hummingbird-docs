@@ -1,0 +1,22 @@
+\chapter{State of the art}\label{ch:state_of_the_art}
+
+The functionalities of the game framework I want to develop for this project do not 
+conform a full game engine, but they are just a part of what a game engine has to 
+offer. For this reason, I considered convenient to study some commercial game engines. 
+There exist generic game engines and game engines specialized in specific genres. 
+I focused on the generic ones, such as Unity\cite{unity3d} and Unreal Engine
+\cite{unrealengine}, because one of my goals is to use it for different projects. 
+Both mentioned engines use componentization for giving their actors (game objects 
+in Unity) behavior and properties \cite{uecomponents}\cite{unitycomponents}. Unity 
+also implements a main loop with a fixed update\cite{unitymainloop}, that is better 
+for AI and physics simulations, as it provides stability and allows for simplicity
+\cite{gameloop}. On the other hand it is good to render as fast as you can and 
+Unity has the rendering outside of the fixed update.
+
+They also implement some kind of resource management that allows easy access to resources 
+without having multiple copies of the same. Which is a basic functionality 
+for preventing filling the memory with unneeded data.
+
+I also read the on-line book Game Programming Patterns\cite{gameprogrammingpatterns}, 
+by Bob Nystrom, to get ideas and solutions to the problems I may face when implementing 
+the framework.

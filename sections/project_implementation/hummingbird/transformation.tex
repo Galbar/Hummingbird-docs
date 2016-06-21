@@ -1,0 +1,26 @@
+\subsection{Transformation}
+
+hum::Tranformation is a simple class that defines a spacial tranformation
+of an object. That is it defines a 3D translation, rotation and scale, using
+hum::Vector3.
+
+The hum::Transformation class has a small and simple interface, its
+position, rotation and scale members can be accessed directly
+(there are no accessors like setPosition(), getPosition()) and it
+contains no mathematical function other than the method transform(), which
+accumulates transformations.
+
+Usage example:
+\begin{lstlisting}[caption=Tranformation example]
+hum::Transformation t, t2;
+t.position.x = 10.f;
+t.rotation.z = 90.f;
+t.scale.x = 0.5f;
+
+t2.position.x = 5.f;
+t2.rotation.z = -25.f;
+t2.scale.x = 0.2f;
+
+t = t.transform(t2);
+hum::log(t); // hum::Transformation ( position=hum::Vector3( 15, 0, 0 ); rotation=hum::Vector3( 0, 0, 65 ); scale=hum::Vector3( 0.1, 1, 1 ) )
+\end{lstlisting}

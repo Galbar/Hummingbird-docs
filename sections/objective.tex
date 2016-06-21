@@ -1,0 +1,28 @@
+\chapter{Objective}\label{ch:objective}
+
+The goal of this project is to design and implement a game development framework that 
+solves the problem described in the previous section. The framework will have solved 
+the problem when it presents the functionalities listed bellow.
+
+\begin{itemize}
+\item The framework implements some basic helper classes for game development. That is, 
+a way to describe transformations of objects and tools for measuring and storing intervals 
+of time;
+\item The framework implements a main loop with fixed update;
+\item The framework handles the creation, destruction and storage of game actors. These 
+actors will contain behaviors that will define its actions and properties;
+\item The framework offers a way of handling resources (loading, accessing, freeing);
+\item The framework will allow extending the main loop with a plug-in system. This feature 
+makes possible adding a rendering pipeline, physics simulation, etc. without having 
+to touch the framework code.
+\end{itemize}
+
+Finally, for demonstrating the usage of the plug-in system. This project will also 
+implement a plug-in that wraps the SFML library. The SFML plug-in will implement:
+
+\begin{itemize}
+\item The resource management of textures, music, sounds, etc. using the structure offered 
+by the framework;
+\item An input handling system;
+\item A 2D rendering pipeline using the SFML utilities.
+\end{itemize}

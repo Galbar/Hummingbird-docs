@@ -1,0 +1,83 @@
+\subsection{MultimediaOGL}
+Plugin that handles all the rendering pipeline, input and resource
+managment.
+
+The MultimediaOGL plugin is the class that groups all the functionalities
+included in MOGL and makes them accessible in the hum::Game.
+
+\subsubsection{Rendering}
+
+The plugin handles the creation of the sf::Window and the OpenGL context.
+The window is made accessible through window().
+
+The plugin also handles the camera, that is accessible by calling getCamera().
+To set and get the clear color setClearColor() and getClearColor() can be
+called.
+
+The rendering of all active and enabled Drawables happens at every postUpdate.
+This may seem anti-intuitive because the position of the Actors is only updated
+every fixedUpdate (we'd be drawing the same frame multiple times), but
+MultimediaOGL does something smart: for all Drawables whose Actors have a
+hum::Kinematic behavior, the position of the Drawable will be interpolated using
+the kinematic information and the fixedUpdateLag. Also, AnimatedSprites's animation
+is also updated when drawn. This way we can have a smooth as posible view of the
+game world and a fixedUpdate for the game logic.
+
+Finally, a game space -> draw space transformation can be set by using
+setDrawSpaceTransform(), for more details see the mehtod's details.
+
+\subsubsection{Resource Management}
+
+The MultimediaOGL plugin owns an instance of each of the resource managers
+included with MOGL. This way one can access any of them at any point inside the
+game.
+
+Example:
+\begin{lstlisting}[caption=MultimediaOGL example]
+class Player : public hum::Behavior
+{
+private:
+  hum::Kinematic* k;
+  mogl::AnimatedSprite* spr;
+  mogl::SoundId sound_id;
+  mogl::MultimediaOGL* mogl;
+public:
+  void init() override
+  {
+    sound_id = 0;
+    // Get a pointer to the MultimediaOGL instance in the Game
+    mogl = actor().game().getPlugin<mogl::MultimediaOGL>();
+    k = actor().getBehavior<hum::Kinematic>();
+    spr = actor().getBehavior<mogl::AnimatedSprite>();
+    spr->setSpriteAnimation(mogl->spriteAnimations().get("player_idle"));
+  }
+
+  void fixedUpdate() override
+  {
+    ...
+    if (k->velocity().x != 0 || k->velocity().y != 0)
+    {
+      // Get the animation "player_walking" from the resource manager for sprite animations
+      auto anim = mogl->spriteAnimations().get("player_walking");
+      if (anim != spr->spriteAnimation())
+          spr->setSpriteAnimation(anim);
+
+      // Play a sound using the sound manager
+      if (mogl->sounds().get(sound_id) == nullptr)
+      {
+        sound_id = mogl->sounds()->play("steps", 75, true);
+      }
+    }
+    else
+    {
+      auto anim = mogl->spriteAnimations().get("player_idle");
+      if (anim != spr->spriteAnimation())
+          spr->setSpriteAnimation(anim);
+      if (mogl->sounds().get(sound_id) != nullptr)
+      {
+        mogl->sounds()->get(sound_id)->stop();
+      }
+    }
+  }
+}
+\end{lstlisting}

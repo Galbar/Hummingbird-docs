@@ -1,0 +1,17 @@
+\subsection{Kinematic}
+Add Kinematic properties to the Actor. (Requires KinematicWorld).
+
+This Behavior allows to give a velocity and an acceleration to an Actor. This way
+the Actor's Transformation will change automatically overtime following a
+kinematic movement.
+
+Usage example:
+\begin{lstlisting}[caption=Kinematic example]
+hum::Game game;
+game.addPlugin<hum::KinematicWorld>();
+
+hum:Actor* actor = game.makeActor();
+hum::Kinematic* k = actor->addBehavior<hum::Kinematic>();
+k->velocity().position.x = 5;
+k->acceleration().rotation.z = 2;
+\end{lstlisting}

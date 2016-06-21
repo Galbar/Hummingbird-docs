@@ -1,0 +1,72 @@
+\subsection{Logging}
+
+The framework includes a set of methods to help the debug process by allowing to print 
+messages depending on the environment (release or debug) and to various channels (standard 
+or error).
+
+\subsubsection{assert\_msg()}
+Check a condition and if it fails, exit the program and print the message.
+
+This method does nothing if NDEBUG is defined.
+
+Usage example:
+\begin{lstlisting}[caption= assert\_msg() example]
+hum::assert\_msg(player\_x > 64, "Player is outside of the map! x=", player\_x);
+\end{lstlisting}
+
+
+\subsubsection{log()}
+Print a message to the standard output.
+
+T can be any type that has the operator \texttt{<<} overloaded.
+It can also be any of the following classes:
+\begin{itemize}
+\item hum::Vector2
+\item hum::Vector3
+\item hum::Transformation
+\item hum::Time
+\item hum::Clock
+\end{itemize}
+
+Usage example:
+\begin{lstlisting}[caption= log() example]
+hum::log("Player position: ", actor().transform().position);
+\end{lstlisting}
+
+\subsubsection{log\_e()}
+Print a message to the error output.
+
+T can be any type that has the operator \texttt{<<} overloaded.
+It can also be any of the following classes:
+\begin{itemize}
+\item hum::Vector2
+\item hum::Vector3
+\item hum::Transformation
+\item hum::Time
+\item hum::Clock
+\end{itemize}
+
+Usage example:
+\begin{lstlisting}[caption= log\_e() example]
+hum::log\_e("Player position: ", actor().transform().position);
+\end{lstlisting}
+
+\subsubsection{log\_d()}
+Print a message to the standard output.
+
+This method does nothing if NDEBUG is defined.
+
+T can be any type that has the operator \texttt{<<} overloaded.
+It can also be any of the following classes:
+\begin{itemize}
+\item hum::Vector2
+\item hum::Vector3
+\item hum::Transformation
+\item hum::Time
+\item hum::Clock
+\end{itemize}
+
+Usage example:
+\begin{lstlisting}[caption=log\_d() example]
+hum::log\_d("Player position: ", actor().transform().position);
+\end{lstlisting}

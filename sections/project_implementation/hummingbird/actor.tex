@@ -1,0 +1,71 @@
+\subsection{Actor}
+
+This class represents an object in the Game. You can create a new Actor by calling
+Game::makeActor(). This method will create a new Actor and return it. The Game owns
+the Actor and it controls its lifetime.
+
+To destroy an Actor you must call Game::destroy(), not its destructor.
+The Actor then, will be marked to be destroyed and after the next update step
+it'll be deleted. Just before being deleted, the Actor will call its
+Behaviors onDestroy() method.
+
+An Actor, by default, doesn't have any behaviour and \textbf{you should not inherit
+from it}.  Instead Actors are composed by Behaviors. These Behaviors are
+the ones that must implement the behaviour of the Actor composed by them.
+
+On the other hand, Actors do have a Transformation, accessible through transform()
+and a reference to its Game, accessible through game().
+
+A Actor can be \textbf{active} or \textbf{inactive}. If a Actor is \textbf{inactive} it exists,
+all its Behaviors also exist and have been instantiated; but it \textbf{won't}
+be updated. Same applies to its Behaviors.
+
+Usage example. The Actor will be destroyed after 10 fixed updates:
+\begin{lstlisting}[caption=Actor example]
+// We define two Behaviors: A and B.
+class B : public hum::Behavior
+{
+public:
+    B(int x): value(x)
+    {}
+
+    int value;
+}
+
+class A : public hum::Behavior
+{
+public:
+    A(int x): current(x)
+    {}
+
+    void init() override
+    {
+        last = actor().getBehavior<B>()->value;
+    }
+
+    void fixedUpdate() override
+    {
+        current++;
+        if (current > last)
+        {
+            actor().game().destroy(actor());
+        }
+        hum::log("Count: ", current);
+    }
+
+private:
+    int last, current;
+}
+
+int main()
+{
+    hum::Game g;
+    hum::Actor* a = g.makeActor();
+    // here we add the A and B to the Actor.
+    A* t = a->addBehavior<A>(1);
+    a->addBehavior<B>(10);
+    g.run();
+    return 0;
+}
+\end{lstlisting}
+

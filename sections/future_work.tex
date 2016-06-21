@@ -1,0 +1,15 @@
+\chapter{Future work}\label{ch:future_work}
+
+The Hummingbird framework and MOGL, although functional, are far from being complete. 
+The following list is a sample of what could be done to improve and extend the project.
+
+\begin{itemize}
+\item \textbf{Data locality}: Proper object pools for Actors and Behaviors to take advantage of caching
+and avoid the iteration over inactive Actors and Behaviors.
+\item \textbf{Hide the glm dependencie from the user}: Use only glm classes internaly, to the point that 
+the eventual user of the MOGL plugin doesn't need to know it is used inside (as in not having to include its headers).
+\item \textbf{3D rendering}: implement more Drawable Behaviors for rendering arbitrary 3D geometry.
+\end{itemize}
+
+There is a lot that can be done, in the end this is just the core of what a game 
+engine is and inside every part of a game engine lots of tweaking can be done.

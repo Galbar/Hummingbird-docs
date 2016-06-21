@@ -1,0 +1,54 @@
+\chapter{Anatomy of a game}\label{ch:anatomy_of_a_game}
+
+\epigraph{A video game is an electronic game that involves human interaction with 
+a user interface to generate visual feedback on a video device such as a TV screen 
+or computer monitor.}{Wikipedia}
+
+The quote above is Wikipedia's definition for \textit{video game}. From it we 
+can extract the various parts that form a video game:
+
+\begin{itemize}
+\item It's a game;
+\item Involves human interaction (input);
+\item From the input generate some feedback;
+\item The feedback is visual (video).
+\end{itemize}
+
+In this document we won't tackle the topic of \textit{what makes a game a game}. Instead 
+we'll focus on the other three points, which are specific to video games.
+
+The first thing to clear up is that a video game, \textit{game} from now on for simplicity, 
+consists of an input-feedback loop. If it wasn't a loop a game would only last one 
+frame.
+
+We'll call this input-feedback loop \textbf{main loop} or \textbf{game loop} and 
+in its simplest form it looks like the following:
+
+\pagebreak
+\begin{lstlisting}[caption=Basic main loop.]
+while (true)
+{
+  processInput(); // Get the human interaction
+  update(); // generate the feedback
+  render(); // display the feedback
+}
+\end{lstlisting}
+
+This is an extremely simplified version of a game loop. More complex versions may 
+include sleep time between cycles, to lower the power consumption, or include a fixed 
+cycle rate, which is useful for physics and AI simulation.
+
+\section{Actors and Scenes}
+
+As games grow more complex, proper structuration of data becomes more important, not 
+only for efficiency but mainly for easying the development process. Generally, this 
+structure is given by the division of the game in \textbf{scenes} and the representation 
+of the game world through \textbf{actors} (or game objects).
+
+Scenes are the natural division of a game. A scene can be a level, a menu screen, 
+etc. Usually, they set up the configuration needed for that given part of the game, 
+when they start, and, when done, they handle the clean up.
+
+Actors, on the other hand, are the objects that live in the game world. From the player 
+to the rock blocking the player's path. They, as their name suggests, \textit{act} 
+in the game's world simulation.

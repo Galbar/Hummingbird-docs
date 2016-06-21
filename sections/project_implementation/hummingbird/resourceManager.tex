@@ -1,0 +1,40 @@
+\subsection{ResourceManager}
+Class that implements the generic functionality of a resource manager.
+
+This template class has three type parameters, two of which are optional. The
+first is the type of the data to manage. The second one is the type of the
+key to identify the managed data (\texttt{std::string} by default). The third is the data needed to load the
+resource (\texttt{std::string} by default).
+
+Usage example (manager for sf::Texture):
+\begin{lstlisting}[caption=ResourceManager example]
+class TextureManager : public ResourceManager<sf::Texture>
+{
+protected:
+  sf::Texture* loadResource(const std::string& name) override
+  {
+    sf::Texture* resource = new sf::Texture();
+    if (not resource->loadFromFile(name))
+      return nullptr;
+    return resource;
+  }
+};
+
+//...
+
+TextureManager tm;
+
+if (!tm.load("cat", "cat.jpg")) {
+  hum::log_e("Error loading cat.jpg");
+}
+if (!tm.load("dog", "dog.jpg")) {
+  hum::log_e("Error loading dog.jpg");
+}
+
+sf::Texture* cat = tm.get("cat"); // get the texture
+
+tm.free("cat"); // unload the cat texture manually
+
+// when destroyed the resource manager will free all loaded resources.
+
+\end{lstlisting}

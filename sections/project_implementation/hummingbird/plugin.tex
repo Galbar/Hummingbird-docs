@@ -1,0 +1,40 @@
+\subsection{Plugin}
+Class from which inherit to implement and give a Plugin for the Game.
+
+A Plugin always lives inside the Game. The Game takes care of the lifecycle
+of the Plugin.
+
+For creating a custom Plugin you may inherit from this class and override
+the methods you need to implement the wanted functionality.
+
+For more information on the lifecycle of a Game see the Game class description.
+
+Usage example:
+\begin{lstlisting}[caption=Plugin example]
+class DeltaTimePlugin : public hum::Plugin
+{
+  void gameStart() override {
+    hum::log("Game just started");
+  }
+
+  void preUpdate() override {
+    hum::log("delta time: ", game().deltaTime());
+  }
+
+  void preFixedUpdate() override {
+    hum::log("fixed update lag: ", game().fixedUpdateLag());
+  }
+
+  void postFixedUpdate() override {
+    hum::log("fixed update lag: ", game().fixedUpdateLag());
+  }
+
+  void postUpdate() override {
+    hum::log("delta time: ", game().deltaTime());
+  }
+
+  void gameEnd() override {
+    hum::log("Game just finished");
+  }
+}
+\end{lstlisting}

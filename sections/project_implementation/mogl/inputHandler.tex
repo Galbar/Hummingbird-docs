@@ -1,0 +1,21 @@
+\subsection{InputHandler}
+Class that handles SFML input events and allows for easy quering of
+related data.
+
+Usage example:
+\begin{lstlisting}[caption=InputHandler example]
+mogl::InputHandler& input = game.getPlugin<mogl::MultimediaOGL>()->input();
+
+// querying the keyboard
+if (input.isKeyPressed(sf::Keyboard::Space))
+{
+    hum::log("Space has been pressed");
+}
+
+// querying the mouse
+hum::Vector2i mouseDelta(0);
+if (input.mouseMoved())
+{
+    mouseDelta = input.getMouseCurrentPosition() - input.getMousePreviousPosition();
+}
+\end{lstlisting}

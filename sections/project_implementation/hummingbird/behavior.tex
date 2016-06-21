@@ -1,0 +1,39 @@
+\subsection{Behavior}
+
+Class from which inherit to implement and give an Actor behavior.
+
+A Behavior always lives inside an Actor. Said actor takes care of the lifecycle
+of the Behavior.
+
+For creating a custom Behavior you may inherit from this class and override
+the methods you need to implement the wanted functionality.
+
+Behaviors must also implement a \texttt{static const char* behaviorName()} method that,
+as the name hints, returns the class name. This is used for error reporting.
+
+Usage example:
+\begin{lstlisting}[caption=Behavior example.]
+class PrintTransform : public hum::Behavior
+{
+public:
+    void init() override
+    {
+        hum::log("Behavior initialized");
+    }
+
+    void fixedUpdate() override
+    {
+        hum::log("Actor transformation: ", actor().transform());
+    }
+
+    void onDestroy() override
+    {
+        hum::log("Actor destroyed");
+    }
+
+    static const char* behaviorName()
+    {
+        return "PrintTransform";
+    }
+}
+\end{lstlisting}

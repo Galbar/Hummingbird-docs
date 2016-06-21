@@ -1,0 +1,298 @@
+\section{Player}
+
+This class implements the Behavior for the Player (the astronaut). It implements 
+the movement, using the keyboard, and displays it on screen. The player has a health 
+bar on top of it. The main problem is that we'll be rotating the player actor and thus, 
+any Drawable attached to it will also rotate, therefore what we'll do to display the health 
+bar is to have another actor that mimics all movement of the player, except for the rotation. 
+We'll call this actor the helper.
+
+Below the class code is exposed and explained.
+
+\begin{lstlisting}
+#ifndef PLAYER_HPP
+#define PLAYER_HPP
+#include "hummingbird/hum.hpp"
+#include "MOGL/MOGL.hpp"
+#include "Bullet.hpp"
+#include "Resources.hpp"
+#include "math.hpp"
+
+class Player : public hum::Behavior
+{
+private:
+    static int s_lives;
+    static float s_vel;
+    static unsigned int s_ms_shoot;
+
+    int p_live;
+    mogl::MultimediaOGL* p_mogl;
+    mogl::AnimatedSprite* p_sprite;
+    hum::Kinematic* p_kinematic;
+    hum::Kinematic* p_helper_kinematic;
+    mogl::Rectangle* p_live_rectangle;
+    float p_prev_rotation;
+    hum::Clock p_clock;
+
+\end{lstlisting}
+
+We start by including the required files. First, we include Hummingbird and MOGL. 
+Then, the various files for the game that are used by the player: Bullet.hpp (the projectile 
+shot by the player), Resources.hpp (includes some functions for loading configuration files) and 
+math.hpp (includes \texttt{cmath} and implements the method \texttt{square(float x)}, useful for 
+calculating distances). We'll see those files in more detail later.
+
+Next, we define the Player class, which is a Behavior, and its private methods.  The 
+static variables are used for storing class wise configuration values, read from a 
+configuration file on the first instantiation of the class. Then we store useful information, 
+such as the number of lives that the player has left and pointers to useful components 
+such as the kinematic behavior of the player actor and the helper actor; MOGL, for 
+accessing input information; the sprite of the player and the rectangle of the health 
+bar; and a clock for measuring time, such as the time between shots.
+
+\begin{lstlisting}
+public:
+    Player()
+    {
+        if (s_vel == -1)
+        {
+            std::stringstream ss;
+            readFileContents("res/config/Player.cfg", ss);
+            ss
+                >> s_vel
+                >> s_ms_shoot
+                >> s_lives;
+        }
+    }
+\end{lstlisting}
+
+As commented before, the first time a Player is instantiated the configuration is read 
+from a file. This avoids having to recomplile the project for adjusting gameplay values.
+
+Afterwards, the initialitazion function of the Behavior is defined. We use it to 
+give the player actor all behaviors and configuration needed, such as adding the 
+AnimatedSprite to it and creating the helper actor for the health bar.
+
+\begin{lstlisting}
+    void init() override
+    {
+        // get the MOGL plugin instance and store it
+        p_mogl = actor().game().getPlugin<mogl::MultimediaOGL>();
+
+        // get the SpriteAnimation, that has already been loaded before
+        // game start, and create the AnimatedSprite with it.
+        mogl::SpriteAnimation* player_animation =
+            p_mogl->spriteAnimations().get("player");
+        p_sprite =
+            actor().addBehavior<mogl::AnimatedSprite>(player_animation);
+        // Set the animation to pause as the player is not moving.
+        p_sprite->pause();
+        // fix the rotation of the sprite.
+        p_sprite->transform().rotation.z = -90;
+
+        // Set the center for transformations of the sprite to the center
+        // of the astronaut tile (a bit displaced from the actual center
+        // of the 48 by 48 tile)
+        p_sprite->setOrigin(hum::Vector3f(24./48., 18./48., 0));
+
+        // Add kinematic behavior to the player actor and store a pointer
+        // to it
+        p_kinematic = actor().addBehavior<hum::Kinematic>();
+
+        // set other useful information
+        p_prev_rotation = 0;
+        p_live = s_lives;
+
+        // Create the helper actor we don't need to save a pointer to it,
+        // as we will mainly work with its Kinematic Behavior and said
+        // behavior has a reference to its actor.
+        hum::Actor* helper = actor().game().makeActor();
+        // Sync the transformations
+        helper->transform() = actor().transform();
+        // Add Kinematic, save it and sync it with the player's one.
+        p_helper_kinematic = helper->addBehavior<hum::Kinematic>();
+        helper->transform().position.z = -0.5;
+        helper->transform().position.y -= 0.8;
+        helper->transform().position.x -= 0.4;
+
+        // Add the background of the health bar
+        auto rect =
+            helper->addBehavior<mogl::Rectangle>(sf::Color::White);
+        rect->transform().scale = hum::Vector3f(0.8, 0.1, 0.02);
+
+        // Add the foreground color of the health bar (the actual
+        // indicator)
+        p_live_rectangle =
+            helper->addBehavior<mogl::Rectangle>(sf::Color::Green);
+        p_live_rectangle->transform().scale =
+            hum::Vector3f(0.8, 0.1, 0.02);
+        p_live_rectangle->transform().position.z = -0.1;
+    }
+\end{lstlisting}
+
+Now we need to implement the update method of the player. We will read the input using 
+the InputHandler instance inside the MOGL plugin and update the player's speed depending 
+on it. We'll also create Bullets if the user presses the left mouse button.
+
+\begin{lstlisting}
+    void fixedUpdate() override
+    {
+        if (isDead())
+        {
+            p_sprite->stop();
+            p_kinematic->velocity().position.x = 0;
+            p_kinematic->velocity().position.y = 0;
+            p_kinematic->velocity().rotation.z = 0;
+
+            p_helper_kinematic->velocity().position.x =
+                p_kinematic->velocity().position.x;
+            p_helper_kinematic->velocity().position.y =
+                p_kinematic->velocity().position.y;
+            return;
+        }
+\end{lstlisting}
+
+First thing, if the player is dead, do nothing. Otherwise, update the rotation and movement 
+speed.
+
+\begin{lstlisting}
+        // Look at the mouse
+        hum::Vector2f mouse = p_mogl->input().getMouseCurrentPosition();
+        mouse /= 48.f;
+        float x = mouse.x - actor().transform().position.x;
+        float y = mouse.y - actor().transform().position.y;
+        float angleInRadians = std::atan2(y, x);
+        float angleInDegrees = (angleInRadians / M_PI) * 180.0;
+        float delta = angleInDegrees - p_prev_rotation;
+        if (delta > 180)
+        {
+            delta -= 360;
+        }
+        else if (delta < -180)
+        {
+            delta += 360;
+        }
+        p_kinematic->velocity().rotation.z =
+            delta / actor().game().fixedUpdateTime().asSeconds();
+        p_prev_rotation = angleInDegrees;
+\end{lstlisting}
+
+In the fragment above, we first get the current position of the mouse and we transform 
+it to game world coordinates by dividing it by 48. This is because in the main funtion 
+we set the window to be 1000 by 1000 pixels, but the viewport to display 1 by 1 squares 
+as 48 by 48 pixels on screen.  We do this because, by default, all Drawables are 1 
+by 1 of size in the game world. To avoid having to set scales to all of them, we scale 
+the view.
+
+Then, we calcultate the angle from the player's position to the mouse position and, from it, 
+the speed at which the player is rotating. This is where \texttt{p\_prev\_rotation} becomes useful.
+
+\begin{lstlisting}
+        // Movement
+        if (p_mogl->input().isKeyDown(sf::Keyboard::A))
+        {
+            p_kinematic->velocity().position.x =
+                -s_vel * (not p_mogl->input().isKeyDown(sf::Keyboard::D));
+        }
+        else if (p_mogl->input().isKeyDown(sf::Keyboard::D))
+        {
+            p_kinematic->velocity().position.x = s_vel;
+        }
+        else
+        {
+            p_kinematic->velocity().position.x = 0;
+        }
+
+        if (p_mogl->input().isKeyDown(sf::Keyboard::W))
+        {
+            p_kinematic->velocity().position.y =
+                -s_vel * (not p_mogl->input().isKeyDown(sf::Keyboard::S));
+        }
+        else if (p_mogl->input().isKeyDown(sf::Keyboard::S))
+        {
+            p_kinematic->velocity().position.y = s_vel;
+        }
+        else
+        {
+            p_kinematic->velocity().position.y = 0;
+        }
+
+        if (p_kinematic->velocity().position.x != 0
+            or p_kinematic->velocity().position.y != 0)
+        {
+            p_sprite->play();
+        }
+        else
+        {
+            p_sprite->pause();
+        }
+\end{lstlisting}
+
+For the movement, we just query the keyboard for the status of the direction keys: 
+\textbf{A}, \textbf{S}, \textbf{D}, \textbf{W}.  And depending on the input, set the 
+speed of the actor. Finally, if the player is moving, play the animation; pause it 
+otherwise.
+
+For shooting we check if the mouse left button is pressed and if the minimum time between shots 
+has passed. The time is checked by using the clock.
+
+\begin{lstlisting}
+        // Shooting
+        if (p_mogl->input().isMouseButtonDown(sf::Mouse::Left)
+            and p_clock.getTime().asMilliseconds() >= s_ms_shoot)
+        {
+            auto bullet = actor().game().makeActor();
+            float mod = sqrt(square(x) + square(y));
+            x /= mod;
+            y /= mod;
+            bullet->addBehavior<Bullet>(x, y);
+            bullet->transform().position.x =
+                actor().transform().position.x + 0.6 * x - 0.14 * y;
+            bullet->transform().position.y =
+                actor().transform().position.y + 0.6 * y + 0.14 * x;
+            p_clock.reset();
+        }
+\end{lstlisting}
+
+If the conditions for shooting are met, we create a new actor, add to it a Bullet Behavior, 
+give a direction to it and place it infront of the player. Lastly, we reset the clock.
+
+\begin{lstlisting}
+        p_helper_kinematic->velocity().position.x =
+            p_kinematic->velocity().position.x;
+        p_helper_kinematic->velocity().position.y =
+            p_kinematic->velocity().position.y;
+
+        sf::Listener::setPosition(
+            actor().transform().position.x,
+            actor().transform().position.y,
+            10);
+    }
+\end{lstlisting}
+
+At the end of the update we sync the helper kinematic and set the position of the listener (sounds).
+
+\begin{lstlisting}
+    void hit()
+    {
+        if (not isDead())
+        {
+            --p_live;
+            p_live_rectangle->transform().scale.x =
+                (float)p_live/s_lives * 0.8;
+        }
+    }
+
+    bool isDead() const
+    {
+        return (p_live <= 0);
+    }
+};
+float Player::s_vel = -1;
+unsigned int Player::s_ms_shoot;
+int Player::s_lives;
+#endif
+\end{lstlisting}
+
+Finally, we implement some functions allowing other classes to interact with the player and 
+we initialize the static members.
