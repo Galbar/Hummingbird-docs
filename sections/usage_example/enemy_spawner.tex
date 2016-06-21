@@ -1,0 +1,49 @@
+\section{Enemy Spawner}
+
+EnemySpawner, as its name suggests spawns enemies. It spawns a new one every half second 
+and positions it randomly inside the viewport.
+
+We will implement the EnemySpawner using a Plugin. This way we don't need to have an extra 
+actor in the game (good for Bullet's checks).
+
+The implementation of the spawner is quite simple. In the constructor we store a pointer to 
+the player, so that we can pass it to the Enemies it creates. Then in the \textit{preUpdate}, 
+if the player is dead does nothing, otherwise it creates a new Enemy every half second.
+
+\begin{lstlisting}
+#ifndef ENEMY_SPAWNER_HPP
+#define ENEMY_SPAWNER_HPP
+#include <cstdlib>
+#include "hummingbird/hum.hpp"
+#include "Enemy.hpp"
+
+class Player;
+class EnemySpawner : public hum::Plugin
+{
+public:
+    EnemySpawner(Player* player):
+    p_player(player)
+    {}
+
+    void preUpdate() override
+    {
+        if (p_player->isDead())
+        {
+            return;
+        }
+        if (clk.getTime().asSeconds() > 0.5)
+        {
+            auto enemy = game().makeActor();
+            enemy->addBehavior<Enemy>(p_player);
+
+            enemy->transform().position.x = rand() % (1000/48);
+            enemy->transform().position.y = rand() % (1000/48);
+            clk.reset();
+        }
+    }
+private:
+    Player* p_player;
+    hum::Clock clk;
+};
+#endif
+\end{lstlisting}

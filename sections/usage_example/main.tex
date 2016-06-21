@@ -1,0 +1,44 @@
+\section{main.cpp}
+
+In the main function we create the Game and add the KinematicWorld and MultimediaOGL plugins 
+to it, in this last one we set the size of the window and its title. Then, we load 
+the resources from the resources configuration file.
+
+Next, we set the camera. By default, Rectangle, Sprite and AnimatedSprite have a size of 1 by 1 space units. 
+As the tiles we want to draw are 48 by 48 pixels, we set the camera viewport to show 21 by 21 space units in 
+a 1000 by 1000 window, making 1 space unit to ocupy aproximately 48 pixels on-screen.
+
+Then, we create an Actor, add it a Player Behavior and set its initial position.
+
+Finally, we add the EnemySpawner to the game, start the background music and run the game.
+
+\begin{lstlisting}
+#include "hummingbird/hum.hpp"
+#include "MOGL/MOGL.hpp"
+#include "Resources.hpp"
+#include "Player.hpp"
+#include "EnemySpawner.hpp"
+
+int main()
+{
+    hum::Game g(60);
+    g.addPlugin<hum::KinematicWorld>();
+    mogl::MultimediaOGL* mogl = g.addPlugin<mogl::MultimediaOGL>(sf::VideoMode(1000, 1000), "Space Shooter");
+    loadResources(*mogl, "res/resources.def");
+
+    // 21 ~= 1000/48
+    mogl->getCamera().setOrthogonal(0, -21, 21, 0);
+
+    auto a = g.makeActor();
+    auto player = a->addBehavior<Player>();
+    a->transform().position.x = 10;
+    a->transform().position.y = 10;
+
+    g.addPlugin<EnemySpawner>(player);
+    sf::Music* music = mogl->music().get("ambiance");
+    music->setLoop(true);
+    music->play();
+    g.run();
+    return 0;
+}
+\end{lstlisting}
